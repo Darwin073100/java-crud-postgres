@@ -12,7 +12,7 @@ public class DataBaseConnection {
     public static Connection getConnection(){
         try {
             conn = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Connection successfully");
+            System.out.println("Connection...");
             return conn;
         } catch (Exception e) {
             System.err.println(e.getMessage() + " :: " + e.getClass().getName());

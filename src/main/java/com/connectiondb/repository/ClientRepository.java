@@ -72,8 +72,11 @@ public class ClientRepository implements Repository<Client> {
 
     @Override
     public void delete(Integer id) throws SQLException{
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        String query = "DELETE FROM client WHERE(id = ?);";
+        try (PreparedStatement stamt = getConnection().prepareStatement(query)){
+            stamt.setInt(1, id);
+            stamt.executeUpdate();
+        } 
     }
     
 }

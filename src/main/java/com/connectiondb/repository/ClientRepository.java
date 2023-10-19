@@ -9,14 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.connectiondb.model.Client;
+import com.connectiondb.util.DataBaseConnection;
 
 public class ClientRepository implements Repository<Client> {
 
-    private Connection connection;
-    
-    public ClientRepository(Connection connection) {
-        this.connection = connection;
+    private Connection getConnection() throws SQLException{
+        return DataBaseConnection.getConnection();
     }
+
+
 
     private Client createClient(ResultSet res) throws SQLException {
         Client client = new Client(res.getInt("id"), res.getString("full_name"),
@@ -27,7 +28,8 @@ public class ClientRepository implements Repository<Client> {
     @Override
     public List<Client> findAll() throws SQLException{
         List<Client> clients = new ArrayList<>();
-        try (Statement stamt = connection.createStatement();
+        try (Connection connection = getConnection();
+            Statement stamt = connection.createStatement();
             ResultSet res = stamt.executeQuery("SELECT * FROM client;")){
             while(res.next()){
                 clients.add(createClient(res));
@@ -39,7 +41,8 @@ public class ClientRepository implements Repository<Client> {
     @Override
     public Client findById(Integer id) throws SQLException {
         Client client = null;
-        try(Statement stamt = connection.createStatement();
+        try(Connection connection = getConnection();
+            Statement stamt = connection.createStatement();
             ResultSet res = stamt.executeQuery("SELECT * FROM client WHERE( id = "+ id +")")){
             if(res.next()){
                 client = createClient(res);
@@ -51,7 +54,8 @@ public class ClientRepository implements Repository<Client> {
     @Override
     public void save(Client t) throws SQLException{
         String sql = "INSERT INTO client (full_name, phone_number, curp) VALUES(?, ?, ?);";
-        try (PreparedStatement stamt = connection.prepareStatement(sql);) {
+        try (Connection connection = getConnection();
+            PreparedStatement stamt = connection.prepareStatement(sql);) {
             stamt.setString(1, t.getFull_name());
             stamt.setString(2, t.getPhoneNumber());
             stamt.setString(3, t.getCurp());
@@ -62,7 +66,8 @@ public class ClientRepository implements Repository<Client> {
     @Override
     public void update(Client t) throws SQLException{
         String sql = "UPDATE client SET full_name = ?, phone_number = ?, curp = ? WHERE(id = ?);";
-        try (PreparedStatement stamt = connection.prepareStatement(sql);) {
+        try (Connection connection = getConnection();
+            PreparedStatement stamt = connection.prepareStatement(sql);) {
             stamt.setString(1, t.getFull_name());
             stamt.setString(2, t.getPhoneNumber());
             stamt.setString(3, t.getCurp());
@@ -74,7 +79,8 @@ public class ClientRepository implements Repository<Client> {
     @Override
     public void delete(Integer id) throws SQLException{
         String query = "DELETE FROM client WHERE(id = ?);";
-        try (PreparedStatement stamt = connection.prepareStatement(query)){
+        try (Connection connection = getConnection();
+            PreparedStatement stamt = connection.prepareStatement(query)){
             stamt.setInt(1, id);
             stamt.executeUpdate();
         } 
